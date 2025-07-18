@@ -21,9 +21,10 @@ This project dynamically generates animated profile cards using real data from t
 - **Fancybox** – Modal UI
 - **Slick Carousel** – Profile slider
 
-## 📸 Screenshots
+## 📸 Screenshot
 
-> *(Add screenshots here if submitting as a visual project)*
+![aaaaa](https://github.com/user-attachments/assets/1a1c26ee-ff83-4bf6-9b2c-f010d99cba57)
+
 
 ## 🚀 Getting Started
 
