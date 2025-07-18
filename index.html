@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastgele Profil Kartları</title>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+    <!-- Slick Slider -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #bf83ba 0%, #000000 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ada4a4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff31c5, #21CBF3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            box-shadow: 0 4px 15px rgb(144, 67, 238);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(166, 203, 233, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        /* Slider Styles */
+        .slider-container {
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .slider-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .slider-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 0 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .slider-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .slider-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid #bed4e6;
+        }
+
+        .slider-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .slider-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Profile Cards Grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+    animation-fill-mode: forwards;
+            min-width: 280px;
+
+        }
+
+        .profile-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-card.hover-effect {
+            border: 3px solid #7921f3;
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .profile-header {
+            background: linear-gradient(45deg, #e465a0, #2478d8);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-username {
+            opacity: 0.9;
+            font-size: 0.9em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-body {
+            padding: 25px;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-info:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .profile-info .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            color: #bbdcf7;
+        }
+
+        .profile-info .label {
+            font-weight: bold;
+            color: #555;
+            margin-right: 10px;
+        }
+
+        .profile-info .value {
+            color: #333;
+            flex: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .shake {
+            animation: shake 1s ease-in-out;
+        }
+
+        .bounce {
+            animation: bounce 1s ease-in-out;
+        }
+
+        /* Fancybox customization */
+        .fancybox-content {
+            background: white;
+            border-radius: 15px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .modal-content {
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .modal-content .profile-avatar {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .modal-detail {
+            text-align: left;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #8c27d4;
+        }
+
+        .modal-detail strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+
+        /* Slick customization */
+        .slick-dots li button:before {
+            color: white;
+            font-size: 12px;
+        }
+
+        .slick-dots li.slick-active button:before {
+            color: #9849f3;
+        }
+
+        .slick-prev:before,
+        .slick-next:before {
+            color: white;
+            font-size: 25px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .slider-container {
+                padding: 20px;
+            }
+        }
+
+                .shaking {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shakeX {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  20% { transform: translateY(0) translateX(-5px); }
+  40% { transform: translateY(0) translateX(5px); }
+  60% { transform: translateY(0) translateX(-5px); }
+  80% { transform: translateY(0) translateX(5px); }
+}
+
+.profile-card.shake-effect {
+  animation: shakeX 0.6s ease-in-out;
+}
+
+@keyframes shakeMargin {
+  0%, 100% { margin-left: 0; }
+  25% { margin-left: -5px; }
+  75% { margin-left: 5px; }
+}
+
+.profile-card.shake-move {
+  animation: shakeMargin 0.5s ease-in-out;
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Random Profil Kartları</h1>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="loadProfiles">Profilleri Yükle</button>
+            <button class="btn" id="clearProfiles">Temizle</button>
+            <button class="btn" id="shakeButton" disabled>Kartları Salla</button>
+        </div>
+
+        <div class="loading hidden" id="loading">
+            <p>Profiller yükleniyor...</p>
+        </div>
+
+        <div class="slider-container">
+            <h2 class="slider-title">Öne Çıkan Profiller</h2>
+            <div class="profile-slider" id="profileSlider">
+            </div>
+        </div>
+
+        <div class="profile-grid" id="profileGrid">
+        </div>
+    </div>
+
+   
+    <script>
+$(document).ready(function () {
+    let allProfiles = [];
+    let profileCount = 12;
+
+    loadProfiles();
+
+    $('#loadProfiles').click(function () {
+        $(this).addClass('bounce');
+        setTimeout(() => $(this).removeClass('bounce'), 1000);
+        loadProfiles();
+    });
+
+    $('#clearProfiles').click(function () {
+        clearProfiles();
+    });
+
+    $('#shakeButton').click(function () {
+        if ($('.profile-card').length === 0) {
+            alert('Lütfen önce profilleri yükleyin.');
+            return;
+        }
+        shakeCards();
+    });
+
+    function loadProfiles() {
+        showLoading();
+
+        $.ajax({
+            url: `https://randomuser.me/api/?results=${profileCount}`,
+            method: 'GET',
+            success: function (data) {
+                hideLoading();
+                allProfiles = data.results;
+                displayProfiles(allProfiles);
+                updateSlider(allProfiles.slice(0, 6));
+            },
+            error: function () {
+                hideLoading();
+                alert('Profiller yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        });
+    }
+
+    function displayProfiles(profiles) {
+        const grid = $('#profileGrid');
+        grid.empty();
+
+        profiles.forEach((profile, index) => {
+            const card = createProfileCard(profile, index);
+            $('#profileGrid').append(card);
+        });
+
+
+        setTimeout(() => {
+            $('.profile-card').each(function (i) {
+                $(this).css({
+                    animation: `fadeInUp 0.6s ease ${i * 0.05}s forwards`
+                });
+            });
+        }, 50);
+
+        $('.profile-card').hover(
+            function () {
+                $(this).addClass('hover-effect');
+            },
+            function () {
+                $(this).removeClass('hover-effect');
+            }
+        );
+
+        $('#shakeButton').prop('disabled', false);
+    }
+
+    function createProfileCard(profile, index) {
+        const fullName = `${profile.name.first} ${profile.name.last}`;
+        const birthDate = new Date(profile.dob.date).toLocaleDateString('tr-TR');
+
+        return $(`
+            <div class="profile-card" data-index="${index}">
+                <div class="profile-header">
+                    <img src="${profile.picture.large}" alt="${fullName}" class="profile-avatar">
+                    <div class="profile-name">${fullName}</div>
+                    <div class="profile-username">@${profile.login.username}</div>
+                </div>
+                <div class="profile-body">
+                    <div class="profile-info">
+                        <div class="icon">📧</div>
+                        <div class="label">E-posta:</div>
+                        <div class="value">${profile.email}</div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="icon">📱</div>
+                        <div class="label">Telefon:</div>
+                        <div class="value">${profile.phone}</div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="icon">🌍</div>
+                        <div class="label">Ülke:</div>
+                        <div class="value">${profile.location.country}</div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="icon">🏙️</div>
+                        <div class="label">Şehir:</div>
+                        <div class="value">${profile.location.city}</div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="icon">🎂</div>
+                        <div class="label">Doğum:</div>
+                        <div class="value">${birthDate}</div>
+                    </div>
+                </div>
+            </div>
+        `).click(function () {
+            openProfileModal(profile);
+        });
+    }
+
+    function updateSlider(profiles) {
+        const slider = $('#profileSlider');
+
+        if (slider.hasClass('slick-initialized')) {
+            slider.slick('unslick');
+        }
+
+        slider.empty();
+
+        profiles.forEach(profile => {
+            const slide = $(`
+                <div class="slider-card">
+                    <img src="${profile.picture.medium}" alt="${profile.name.first} ${profile.name.last}">
+                    <h4>${profile.name.first} ${profile.name.last}</h4>
+                    <p>${profile.location.country}</p>
+                </div>
+            `);
+            slider.append(slide);
+        });
+
+        slider.slick({
+            dots: true,
+            infinite: true,
+            speed: 500,
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 3000,
+            responsive: [
+                {
+                    breakpoint: 768,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1
+                    }
+                }
+            ]
+        });
+    }
+
+    function openProfileModal(profile) {
+        const fullName = `${profile.name.first} ${profile.name.last}`;
+        const birthDate = new Date(profile.dob.date).toLocaleDateString('tr-TR');
+        const registerDate = new Date(profile.registered.date).toLocaleDateString('tr-TR');
+
+        const modalContent = `
+            <div class="modal-content">
+                <img src="${profile.picture.large}" alt="${fullName}" class="profile-avatar">
+                <h2>${fullName}</h2>
+                
+                <div class="modal-detail"><strong>Kullanıcı Adı</strong>${profile.login.username}</div>
+                <div class="modal-detail"><strong>E-posta Adresi</strong>${profile.email}</div>
+                <div class="modal-detail"><strong>Telefon Numarası</strong>${profile.phone}</div>
+                <div class="modal-detail"><strong>Cep Telefonu</strong>${profile.cell}</div>
+                <div class="modal-detail"><strong>Adres</strong>${profile.location.street.number} ${profile.location.street.name}, ${profile.location.city}, ${profile.location.state}, ${profile.location.country}</div>
+                <div class="modal-detail"><strong>Doğum Tarihi</strong>${birthDate} (${profile.dob.age} yaşında)</div>
+                <div class="modal-detail"><strong>Kayıt Tarihi</strong>${registerDate}</div>
+                <div class="modal-detail"><strong>Cinsiyet</strong>${profile.gender === 'male' ? 'Erkek' : 'Kadın'}</div>
+            </div>
+        `;
+
+        $.fancybox.open({
+            src: modalContent,
+            type: 'html',
+            opts: {
+                afterShow: function () {
+                    $('.fancybox-content').css('border-radius', '15px');
+                }
+            }
+        });
+    }
+
+    function clearProfiles() {
+        $('.profile-card').each(function (index) {
+            const card = $(this);
+            setTimeout(() => {
+                card.fadeOut(300, function () {
+                    card.remove();
+                });
+            }, index * 50);
+        });
+
+        if ($('#profileSlider').hasClass('slick-initialized')) {
+            $('#profileSlider').slick('unslick');
+        }
+
+        $('#profileSlider').empty();
+        allProfiles = [];
+    }
+
+function shakeCards() {
+    $('.profile-card').each(function (index) {
+        const card = $(this);
+        setTimeout(() => {
+            card.css('margin-left', '5px');
+            setTimeout(() => card.css('margin-left', '-5px'), 100);
+            setTimeout(() => card.css('margin-left', '3px'), 200);
+            setTimeout(() => card.css('margin-left', '0px'), 300);
+        }, index * 100);
+    });
+}
+
+
+
+
+    function showLoading() {
+        $('#loading').removeClass('hidden');
+    }
+
+    function hideLoading() {
+        $('#loading').addClass('hidden');
+    }
+});
+</script>
+</body>
+
+</html>
