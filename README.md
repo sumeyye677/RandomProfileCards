@@ -1,5 +1,7 @@
 # 🌐 Random Profile Cards
 
+## Web Live Link: https://randomprofilecards.netlify.app/
+
 This project dynamically generates animated profile cards using real data from the [Random User API](https://randomuser.me/). The interface is styled for a modern, soft aesthetic and includes interactive elements such as card animations, sliders, and modals.
 
 ## 📌 Features
